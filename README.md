@@ -302,3 +302,67 @@ Screenshot of the KQL query and returned command-line activity:
 
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_21_34_13" src="https://github.com/user-attachments/assets/ccc9f72f-f914-46e8-8f44-cb38b69ee65d" />
+
+### 7. Investigating the Malicious Domain Infrastructure
+
+After identifying `secure-health-access.com` as the destination associated with the stolen patient-data archives, the next step was to investigate the domain's infrastructure.
+
+The first objective was to identify the IP addresses associated with the domain.
+
+### 7.1 Domain to IP Association
+
+### KQL Query
+
+```kql id="6w2rqa"
+PassiveDns
+| where domain == "secure-health-access.com"
+```
+
+### Finding
+
+The query showed that `secure-health-access.com` resolved to two IP addresses:
+
+`203.0.113.1`
+
+`203.0.113.2`
+
+### Analysis
+
+The domain's association with two IP addresses provides additional infrastructure indicators for the investigation. These IP addresses can be used to search for other domains associated with the same infrastructure.
+
+### Evidence
+
+Screenshot of the domain-to-IP Passive DNS query and result:
+<img width="1366" height="768" alt="Screenshot_2026-10-01_22_07_29" src="https://github.com/user-attachments/assets/33786811-018d-4f7c-ae11-c82155855b08" />
+### 7.2 Identifying Other Domains Sharing the Infrastructure
+
+The next step was to investigate whether other domains were associated with the identified IP addresses.
+
+### KQL Query
+
+```kql id="3f7mvp"
+PassiveDns
+| where ip in ("203.0.113.1", "203.0.113.2")
+```
+
+### Finding
+
+The query identified another domain associated with the infrastructure:
+
+`emr-help.net`
+
+The domain was associated with:
+
+`203.0.113.1`
+
+### Analysis
+
+The discovery of `emr-help.net` on the same IP infrastructure as `secure-health-access.com` provides another domain for investigation.
+
+This does not by itself establish that both domains belong to the same attacker. Further investigation should examine DNS history, timestamps, network connections, and activity involving `emr-help.net` to determine whether the domain has a connection to the ransomware operation.
+
+### Evidence
+
+Screenshot of the IP-to-domain Passive DNS query and result:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-01_22_09_37" src="https://github.com/user-attachments/assets/5b24792b-e29a-4979-92d8-d7c662a914b9" />
