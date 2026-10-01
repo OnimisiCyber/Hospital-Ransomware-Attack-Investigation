@@ -163,7 +163,7 @@ Screenshot of the KQL query and result:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_20_51_21" src="https://github.com/user-attachments/assets/6db0a3ae-282e-4af4-a71b-8b4f63ca3059" />
 
-### 5. Identifying the Ransomware Executable
+### 5. Identifying and Tracking the Ransomware Executable
 
 The 14 process events from `AMFB-MACHINE` were reviewed by examining the `process_commandline` column from top to bottom.
 
@@ -171,7 +171,7 @@ During this review, a suspicious executable named `lockbyte_ransomer.exe` was id
 
 ### KQL Query
 
-```kql id="1s9d5c"
+```kql id="8n2xqk"
 ProcessEvents
 | where hostname == "AMFB-MACHINE"
 | where process_commandline contains "ransomer"
@@ -179,7 +179,7 @@ ProcessEvents
 
 ### Finding
 
-The query identified process activity containing `ransomer` in the command line. One suspicious executable was identified:
+The investigation identified the following suspicious executable:
 
 `lockbyte_ransomer.exe`
 
@@ -191,11 +191,21 @@ User:
 
 `andavis`
 
+The investigation also showed that the ransomware executable was copied to a network share and given a new filename:
+
+`spread_ransomware.exe`
+
+The observed path was:
+
+`C:\Users\andavis\Downloads\lockbyte_ransomer.exe\jojos-hospital.org\shared\spread_ransomware.exe`
+
 ### Analysis
 
-The presence of `lockbyte_ransomer.exe` provides a direct lead for the ransomware investigation. The executable name is consistent with the ransomware activity being investigated, but the process name alone does not establish maliciousness.
+The evidence shows activity involving `lockbyte_ransomer.exe` on Anthony Davis's machine and a subsequent copy of the executable to the hospital's network share under the name `spread_ransomware.exe`.
 
-Further investigation should focus on the executable's hash, execution timestamp, process details, parent process, command line, and related file activity.
+The filename change is important because searching only for `lockbyte_ransomer.exe` would miss the renamed copy. The network-share location also provides a lead for investigating whether the ransomware was distributed to other systems through the shared location.
+
+Further investigation should examine the network share activity, the renamed executable, other hosts accessing the share, and the processes associated with `spread_ransomware.exe`.
 
 ### Evidence
 
