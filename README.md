@@ -95,7 +95,7 @@ FileCreationEvents
 
 The SHA-256 hash identified for the ransom note was:
 
-`97c348e95c8a8aeb8808f76434d73a92bbcb6b4586788365762b22624990b018`
+`97c348e95c8a8aeb8808f76434d73a92bbcb6b4586788365762b22624990b018` which is under this Path: C:\\Users\\andavis\\Documents\\We_Have_Your_Data_Pay_Up.txt i the system 
 
 ### Analysis
 
