@@ -265,7 +265,8 @@ C:\Users\andavis\Downloads\patient_data_exporter.exe /export C:\Users\andavis\Do
 
 After the patient data was collected and compressed into ZIP archives, the investigation showed that the stolen data was sent to the suspicious external domain:
 
-`secure-health-access.com`
+`secure-health-access.com` which is also the same domain where the malicious executable 
+`patient_data_exporter.exe` was downloaded from
 
 Each of the three ZIP files was associated with this destination.
 
