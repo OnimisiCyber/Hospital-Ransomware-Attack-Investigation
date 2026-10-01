@@ -212,3 +212,73 @@ Further investigation should examine the network share activity, the renamed exe
 Screenshot of the KQL query and returned process event:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_20_59_47" src="https://github.com/user-attachments/assets/3e54dd00-c35d-4ba7-9600-1b2bae5b0fd4" />
+
+
+### 6. Identifying Potential Patient Data Collection
+
+The next step was to review the distinct process command lines executed on `AMFB-MACHINE` during the investigation period.
+
+### KQL Query
+
+```kql id="m7x4kp"
+ProcessEvents
+| where hostname == "AMFB-MACHINE"
+| where timestamp between (datetime(2024-06-17) .. datetime(2024-06-18))
+| distinct process_commandline
+```
+
+### Finding
+
+The command-line activity revealed a suspicious executable named:
+
+`patient_data_exporter.exe`
+
+The executable was used with an `/export` parameter to create ZIP archives from patient-data directories on the hospital server.
+
+Three export operations were identified:
+
+1. `patient_data_1.zip`
+
+Source:
+
+`\\jojos-hospital-server\important_data\patient_records`
+
+2. `patient_data_2.zip`
+
+Source:
+
+`\\jojos-hospital-server\important_data\archive\patient-records`
+
+3. `patient_data_3.zip`
+
+Source:
+
+`\\jojos-hospital-server\important_data\old-patient-data`
+
+Example command line:
+
+```text
+C:\Users\andavis\Downloads\patient_data_exporter.exe /export C:\Users\andavis\Documents\patient_data_3.zip /source \\jojos-hospital-server\important_data\old-patient-data
+```
+
+### Analysis
+
+The command-line evidence shows that `patient_data_exporter.exe` was used to export patient-related data from three directories on the hospital server into ZIP archives stored under Anthony Davis's user profile.
+
+The three source directories were:
+
+`\\jojos-hospital-server\important_data\patient_records`
+
+`\\jojos-hospital-server\important_data\archive\patient-records`
+
+`\\jojos-hospital-server\important_data\old-patient-data`
+
+This activity provides evidence of patient-data collection from the hospital server. The available evidence does not yet establish whether the ZIP archives were successfully transferred outside the hospital environment.
+
+The exported ZIP files are therefore important artifacts for the next stage of the investigation. Further analysis should determine when the archives were created, whether they were accessed or moved, and whether network activity indicates possible exfiltration.
+
+### Evidence
+
+Screenshot of the KQL query and returned command-line activity:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-01_21_34_13" src="https://github.com/user-attachments/assets/ccc9f72f-f914-46e8-8f44-cb38b69ee65d" />
