@@ -108,3 +108,27 @@ This hash will be useful for searching other events and determining whether the 
 Screenshot of the KQL query and result:
 
 `<img width="1366" height="768" alt="Screenshot_2026-10-01_16_44_44" src="https://github.com/user-attachments/assets/62d90a9b-2249-437f-8f7f-46213ac02672" />
+
+Checking to know how many hosts (machines) was this ransom file seen 
+
+
+### KQL Query
+
+```kql
+FileCreationEvents
+| where filename == "We_Have_Your_Data_Pay_Up.txt"
+| count
+```
+
+### Result
+
+The query returned `[1]` unique host (Machine)
+
+
+
+### Evidence
+
+Screenshot of the KQL query and result:
+
+`<img width="1366" height="768" alt="Screenshot_2026-10-01_16_55_29" src="https://github.com/user-attachments/assets/0f16ee3e-c441-4ed3-8265-4e12a504131d" />
+
