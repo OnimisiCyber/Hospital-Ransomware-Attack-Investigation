@@ -428,3 +428,49 @@ Screenshot of the KQL query and returned request:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_22_26_39" src="https://github.com/user-attachments/assets/681bc4cf-9196-44c4-b7fe-ba9018614776" />
 
+### 9. Investigating Account Authentication from the Suspicious IPs
+
+After identifying inbound requests from `203.0.113.1` and `203.0.113.2`, the next step was to determine whether either IP address was used to authenticate to an account within the hospital environment.
+
+### 9.1 Identifying Authentication Activity
+
+### KQL Query
+
+```kql id="q6m1vz"
+AuthenticationEvents
+| where src_ip in ("203.0.113.1", "203.0.113.2")
+```
+
+### Finding
+
+The query identified one authentication event originating from:
+
+`203.0.113.1`
+
+The authentication occurred on:
+
+Hostname:
+
+`MAIL-SERVER01`
+
+The host was later associated with the user:
+
+`andavis`
+
+User:
+
+`Anthony Davis`
+
+### Analysis
+
+The authentication event links the suspicious IP address `203.0.113.1` to an authenticated session involving `MAIL-SERVER01`.
+
+The hostname was then investigated to determine which user's device or account was associated with the system. The result identified `andavis`, the same username previously associated with `AMFB-MACHINE` and the ransomware investigation.
+
+This creates an important connection between the suspicious infrastructure and Anthony Davis's account.
+
+### Evidence
+
+Screenshot of the authentication query and result:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-01_22_41_41" src="https://github.com/user-attachments/assets/92a3d41a-2a1c-45f5-9bb7-3d5c918dc075" />
