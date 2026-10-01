@@ -214,13 +214,13 @@ Screenshot of the KQL query and returned process event:
 <img width="1366" height="768" alt="Screenshot_2026-10-01_20_59_47" src="https://github.com/user-attachments/assets/3e54dd00-c35d-4ba7-9600-1b2bae5b0fd4" />
 
 
-### 6. Identifying Potential Patient Data Collection
+### 6. Identifying Patient Data Collection and Exfiltration
 
 The next step was to review the distinct process command lines executed on `AMFB-MACHINE` during the investigation period.
 
 ### KQL Query
 
-```kql id="m7x4kp"
+```kql
 ProcessEvents
 | where hostname == "AMFB-MACHINE"
 | where timestamp between (datetime(2024-06-17) .. datetime(2024-06-18))
@@ -233,23 +233,23 @@ The command-line activity revealed a suspicious executable named:
 
 `patient_data_exporter.exe`
 
-The executable was used with an `/export` parameter to create ZIP archives from patient-data directories on the hospital server.
+The executable was used with an `/export` parameter to collect patient data from directories on the hospital server and create ZIP archives.
 
-Three export operations were identified:
+Three exported archives were identified:
 
-1. `patient_data_1.zip`
+`patient_data_1.zip`
 
 Source:
 
 `\\jojos-hospital-server\important_data\patient_records`
 
-2. `patient_data_2.zip`
+`patient_data_2.zip`
 
 Source:
 
 `\\jojos-hospital-server\important_data\archive\patient-records`
 
-3. `patient_data_3.zip`
+`patient_data_3.zip`
 
 Source:
 
@@ -261,24 +261,25 @@ Example command line:
 C:\Users\andavis\Downloads\patient_data_exporter.exe /export C:\Users\andavis\Documents\patient_data_3.zip /source \\jojos-hospital-server\important_data\old-patient-data
 ```
 
+### Data Exfiltration
+
+After the patient data was collected and compressed into ZIP archives, the investigation showed that the stolen data was sent to a suspicious external domain:
+
+`secure-health-access.com`
+
+Each of the three ZIP files was associated with this destination.
+
 ### Analysis
 
-The command-line evidence shows that `patient_data_exporter.exe` was used to export patient-related data from three directories on the hospital server into ZIP archives stored under Anthony Davis's user profile.
+The evidence shows a sequence of activity involving patient-data collection, archive creation, and transmission to an external destination.
 
-The three source directories were:
+The three source directories contained patient-related information, making this activity relevant to the attackers' threat to release sensitive patient information.
 
-`\\jojos-hospital-server\important_data\patient_records`
-
-`\\jojos-hospital-server\important_data\archive\patient-records`
-
-`\\jojos-hospital-server\important_data\old-patient-data`
-
-This activity provides evidence of patient-data collection from the hospital server. The available evidence does not yet establish whether the ZIP archives were successfully transferred outside the hospital environment.
-
-The exported ZIP files are therefore important artifacts for the next stage of the investigation. Further analysis should determine when the archives were created, whether they were accessed or moved, and whether network activity indicates possible exfiltration.
+The association between each ZIP archive and `secure-health-access.com` provides an important lead for investigating the data-exfiltration stage of the attack.
 
 ### Evidence
 
 Screenshot of the KQL query and returned command-line activity:
+
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_21_34_13" src="https://github.com/user-attachments/assets/ccc9f72f-f914-46e8-8f44-cb38b69ee65d" />
