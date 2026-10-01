@@ -132,3 +132,73 @@ Screenshot of the KQL query and result:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_16_55_29" src="https://github.com/user-attachments/assets/0f16ee3e-c441-4ed3-8265-4e12a504131d" />
 
+### 4. Investigating Process Activity on the Affected Host
+
+The ransom note `We_Have_Your_Data_Pay_Up.txt` was identified on only one machine, `AMFB-MACHINE`, belonging to Anthony Davis with the username `andavis`.
+
+Because the ransom note appeared on this host, the next step was to investigate process activity on the machine during the period surrounding the ransomware activity.
+
+### KQL Query
+
+```kql
+ProcessEvents
+| where hostname == "AMFB-MACHINE"
+| where timestamp between (datetime(2024-06-17) .. datetime(2024-06-18))
+| count
+```
+
+### Result
+
+The query returned 14 process events.
+
+### Analysis
+
+A total of 14 process events were recorded on `AMFB-MACHINE` between June 17 and June 18, 2024.
+
+The presence of process activity during the same period as the ransomware investigation makes this host a key system for further analysis. The next step is to examine the individual process events to identify the processes executed, their timestamps, associated users, command lines, and any suspicious activity.
+
+### Evidence
+
+Screenshot of the KQL query and result:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-01_20_51_21" src="https://github.com/user-attachments/assets/6db0a3ae-282e-4af4-a71b-8b4f63ca3059" />
+
+### 5. Identifying the Ransomware Executable
+
+The 14 process events from `AMFB-MACHINE` were reviewed by examining the `process_commandline` column from top to bottom.
+
+During this review, a suspicious executable named `lockbyte_ransomer.exe` was identified on Anthony Davis's machine.
+
+### KQL Query
+
+```kql id="1s9d5c"
+ProcessEvents
+| where hostname == "AMFB-MACHINE"
+| where process_commandline contains "ransomer"
+```
+
+### Finding
+
+The query identified process activity containing `ransomer` in the command line. One suspicious executable was identified:
+
+`lockbyte_ransomer.exe`
+
+Host:
+
+`AMFB-MACHINE`
+
+User:
+
+`andavis`
+
+### Analysis
+
+The presence of `lockbyte_ransomer.exe` provides a direct lead for the ransomware investigation. The executable name is consistent with the ransomware activity being investigated, but the process name alone does not establish maliciousness.
+
+Further investigation should focus on the executable's hash, execution timestamp, process details, parent process, command line, and related file activity.
+
+### Evidence
+
+Screenshot of the KQL query and returned process event:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-01_20_59_47" src="https://github.com/user-attachments/assets/3e54dd00-c35d-4ba7-9600-1b2bae5b0fd4" />
