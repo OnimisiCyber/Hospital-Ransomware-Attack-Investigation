@@ -214,69 +214,76 @@ Screenshot of the KQL query and returned process event:
 <img width="1366" height="768" alt="Screenshot_2026-10-01_20_59_47" src="https://github.com/user-attachments/assets/3e54dd00-c35d-4ba7-9600-1b2bae5b0fd4" />
 
 
-### 6. Identifying Patient Data Collection and Exfiltration
+6. Identifying Patient Data Collection, Exfiltration, and Cleanup
 
-The next step was to review the distinct process command lines executed on `AMFB-MACHINE` during the investigation period.
+The next step was to review the distinct process command lines executed on AMFB-MACHINE during the investigation period.
 
-### KQL Query
-
-```kql
+KQL Query
 ProcessEvents
 | where hostname == "AMFB-MACHINE"
 | where timestamp between (datetime(2024-06-17) .. datetime(2024-06-18))
 | distinct process_commandline
-```
-
-### Finding
+Finding
 
 The command-line activity revealed a suspicious executable named:
 
-`patient_data_exporter.exe`
+patient_data_exporter.exe
 
-The executable was used with an `/export` parameter to collect patient data from directories on the hospital server and create ZIP archives.
+The executable was used with an /export parameter to collect patient data from directories on the hospital server and create ZIP archives.
 
 Three exported archives were identified:
 
-`patient_data_1.zip`
+patient_data_1.zip
 
 Source:
 
-`\\jojos-hospital-server\important_data\patient_records`
+\\jojos-hospital-server\important_data\patient_records
 
-`patient_data_2.zip`
-
-Source:
-
-`\\jojos-hospital-server\important_data\archive\patient-records`
-
-`patient_data_3.zip`
+patient_data_2.zip
 
 Source:
 
-`\\jojos-hospital-server\important_data\old-patient-data`
+\\jojos-hospital-server\important_data\archive\patient-records
+
+patient_data_3.zip
+
+Source:
+
+\\jojos-hospital-server\important_data\old-patient-data
 
 Example command line:
 
-```text
 C:\Users\andavis\Downloads\patient_data_exporter.exe /export C:\Users\andavis\Documents\patient_data_3.zip /source \\jojos-hospital-server\important_data\old-patient-data
-```
+Data Exfiltration
 
-### Data Exfiltration
+After the patient data was collected and compressed into ZIP archives, the investigation showed that the stolen data was sent to the suspicious external domain:
 
-After the patient data was collected and compressed into ZIP archives, the investigation showed that the stolen data was sent to a suspicious external domain:
-
-`secure-health-access.com`
+secure-health-access.com
 
 Each of the three ZIP files was associated with this destination.
 
-### Analysis
+Evidence of Cleanup Activity
 
-The evidence shows a sequence of activity involving patient-data collection, archive creation, and transmission to an external destination.
+The investigation also identified a command used to delete the exported ZIP archives:
 
-The three source directories contained patient-related information, making this activity relevant to the attackers' threat to release sensitive patient information.
+cmd.exe /c del C:\Users\andavis\Documents\patient_data_*.zip
 
-The association between each ZIP archive and `secure-health-access.com` provides an important lead for investigating the data-exfiltration stage of the attack.
+The wildcard patient_data_*.zip targets the exported patient-data archives stored in Anthony Davis's Documents directory.
 
+This activity occurred after the data collection and transfer activity and is consistent with an attempt to remove the locally stored copies of the collected data.
+
+Analysis
+
+The evidence shows a sequence involving patient-data collection, archive creation, transmission to an external destination, and subsequent deletion of the ZIP archives from the local machine.
+
+The observed sequence is:
+
+Patient data was collected from hospital server directories.
+The collected data was compressed into three ZIP archives.
+The ZIP archives were associated with secure-health-access.com.
+A command was used to delete the local ZIP archives.
+
+The cleanup command provides an additional investigation lead because deleting the local archives might have reduced the amount of evidence available on the compromised machine.
 ### Evidence
 
 Screenshot of the KQL query and returned command-line activity:
