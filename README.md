@@ -364,3 +364,67 @@ The discovery of `emr-help.net` on the same IP infrastructure as `secure-health-
 Screenshot of the IP-to-domain Passive DNS query and result:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_22_09_37" src="https://github.com/user-attachments/assets/5b24792b-e29a-4979-92d8-d7c662a914b9" />
+
+### 8. Investigating Inbound Requests from the Identified IP Addresses
+
+After identifying `203.0.113.1` and `203.0.113.2` as IP addresses associated with `secure-health-access.com`, the next step was to determine whether these IPs made requests to Jojo Hospital's web infrastructure.
+
+### 8.1 Identifying Inbound Requests
+
+### KQL Query
+
+```kql id="v7c1pk"
+InboundNetworkEvents
+| where src_ip in ("203.0.113.1", "203.0.113.2")
+```
+
+### Result
+
+The query returned 37 inbound network events originating from the two identified IP addresses.
+
+### Analysis
+
+The result shows that the two IP addresses associated with the suspicious domain generated 37 inbound requests to Jojo Hospital's network.
+
+This provided a basis for examining the specific URLs requested by the source IPs.
+
+### Evidence
+
+Screenshot of the inbound network query and result:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-01_22_24_38" src="https://github.com/user-attachments/assets/b90892bb-505a-4f12-a5fe-f36574661d98" />
+
+### 8.2 Investigating Requests Containing "Bypass"
+
+The next step was to search the inbound requests for URLs containing the term `bypass`.
+
+### KQL Query
+
+```kql id="2k8xvd"
+InboundNetworkEvents
+| where src_ip in ("203.0.113.1", "203.0.113.2")
+| where url has "bypass"
+```
+
+### Finding
+
+The query identified a request to the Jojo Hospital website containing a search for:
+
+`how to bypass security JoJo's Hospital`
+
+Observed URL:
+
+`https://jojoshospital.org/search=how+to+bypass+security+JoJo%27s+Hospital`
+
+### Analysis
+
+The request shows that a source IP associated with the previously identified suspicious infrastructure accessed Jojo Hospital's website and searched for information related to bypassing the hospital's security.
+
+
+
+### Evidence
+
+Screenshot of the KQL query and returned request:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-01_22_26_39" src="https://github.com/user-attachments/assets/681bc4cf-9196-44c4-b7fe-ba9018614776" />
+
