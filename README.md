@@ -79,3 +79,32 @@ This result shows the number of unique hosts where files with the `.encrypted` e
 Screenshot of the KQL query and returned result:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_16_37_46 (copy 1)" src="https://github.com/user-attachments/assets/5100897d-7e20-4dba-a597-de1c29e2ca32" />
+
+### 3. Identifying the SHA-256 Hash of the Ransom Note
+
+The next step was to identify the SHA-256 hash associated with the ransom note created during the ransomware attack.
+
+### KQL Query
+
+```kql
+FileCreationEvents
+| where filename == "We_Have_Your_Data_Pay_Up.txt"
+```
+
+### Result
+
+The SHA-256 hash identified for the ransom note was:
+
+`97c348e95c8a8aeb8808f76434d73a92bbcb6b4586788365762b22624990b018`
+
+### Analysis
+
+The identified SHA-256 hash serves as a file indicator of compromise (IOC) associated with the ransom note `We_Have_Your_Data_Pay_Up.txt`.
+
+This hash will be useful for searching other events and determining whether the same ransom note appeared on multiple hosts during the attack.
+
+### Evidence
+
+Screenshot of the KQL query and result:
+
+`<img width="1366" height="768" alt="Screenshot_2026-10-01_16_44_44" src="https://github.com/user-attachments/assets/62d90a9b-2249-437f-8f7f-46213ac02672" />
