@@ -359,8 +359,6 @@ The domain was associated with:
 
 The discovery of `emr-help.net` on the same IP infrastructure as `secure-health-access.com` provides another domain for investigation.
 
-This does not by itself establish that both domains belong to the same attacker. Further investigation should examine DNS history, timestamps, network connections, and activity involving `emr-help.net` to determine whether the domain has a connection to the ransomware operation.
-
 ### Evidence
 
 Screenshot of the IP-to-domain Passive DNS query and result:
