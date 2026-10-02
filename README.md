@@ -548,3 +548,89 @@ The investigation identified 26 outbound requests from 24 unique source IPs to t
 The difference between the two numbers indicates that some source IPs generated more than one matching request.
 
 
+### 11. Investigating the Redirect Chain and Malicious Files
+
+After identifying 26 requests from 24 unique source IPs to the lookalike domain `raisinkanes.com`, the investigation continued by examining the redirects associated with the domain.
+
+### 11.1 Identifying Redirect Activity
+
+The following query was used to identify outbound requests containing redirect activity.
+
+### KQL Query
+
+```kql id="k2v9rx"
+OutboundNetworkEvents
+| where url has "redirect"
+```
+
+### Finding
+
+The investigation identified redirects from the malicious lookalike domain to:
+
+`nothing-to-see-here.net`
+
+Further investigation also identified a redirect to:
+
+`totally-legit-domain.com`
+
+### 11.2 Investigating the Redirect Destination
+
+The results were narrowed to requests containing `totally` to investigate activity associated with the second redirect destination.
+
+### KQL Query
+
+```kql id="p5c7yd"
+OutboundNetworkEvents
+| where url has "totally"
+```
+
+### Finding
+
+The investigation showed that `totally-legit-domain.com` redirected users to a Microsoft Word document named:
+
+`Raisin_Kane_Promo_Offer.docx`
+
+Full URL:
+
+`https://totally-legit-domain.com/published/Raisin_Kane_Promo_Offer.docx`
+
+The investigation also identified redirects from the same domain to a PDF file named:
+
+`Raisin_Kane_Free_Meal_Voucher.pdf`
+
+### Analysis
+
+The redirect chain shows that requests to the lookalike domain led users through additional domains before reaching files presented as promotional or free-meal offers.
+
+At this stage, the files should be treated as suspicious artifacts rather than confirmed malware. Further investigation should examine the file hashes, download events, affected hosts, users who accessed the files, and any process or execution activity following the downloads.
+
+### Redirect Chain
+
+`raisinkanes.com`
+
+↓
+
+`nothing-to-see-here.net`
+
+↓
+
+`totally-legit-domain.com`
+
+↓
+
+`Raisin_Kane_Promo_Offer.docx`
+
+or
+
+`Raisin_Kane_Free_Meal_Voucher.pdf`
+
+### Evidence
+
+Screenshot of the redirect query and results:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_21_16_43" src="https://github.com/user-attachments/assets/c28380e0-d487-422e-a2f0-51fc42e5406c" />
+
+Screenshot showing the `totally-legit-domain.com` activity and file redirects:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_21_20_39" src="https://github.com/user-attachments/assets/1566f7af-c841-4677-b64e-de57fec48b9c" />
+
