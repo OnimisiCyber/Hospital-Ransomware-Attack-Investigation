@@ -923,5 +923,56 @@ Current findings from this stage:
 * The investigation found no relevant DOCX result.
 * `network_diagrams.pdf` was identified from the PDF-related process activity.
 
+### 15. Confirming Credential Exfiltration
+
+As the investigation was nearing completion, further review of the process command lines on `AMFB-MACHINE` revealed additional activity involving credential information.
+
+The attacker copied credential information and compressed the collected data into:
+
+`important_network_info.zip`
+
+The investigation then identified a `curl` command used to upload `important_network_info.zip` to:
+
+`nothing-to-see-here.net`
+
+### Analysis
+
+This provides evidence of data exfiltration from the compromised environment.
+
+The archive contained a file named:
+
+`credentials.txt`
+
+Based on the filename, the file likely contained credential information such as usernames and passwords. The contents of the file were not assumed during the investigation and should be examined directly to determine which credentials were exposed and which systems or accounts they provide access to.
+
+The sequence identified during the investigation was:
+
+1. Credential information was collected.
+2. The information was compressed into `important_network_info.zip`.
+3. The attacker used `curl` to transfer the archive.
+4. The archive was uploaded to `nothing-to-see-here.net`.
+5. The activity provides evidence of credential-data exfiltration.
+
+### Recommended Response
+
+The affected systems should be isolated from the network to limit further attacker activity.
+
+The `credentials.txt` file and related artifacts should be preserved and investigated to determine:
+
+* Which usernames and passwords were exposed.
+* Which systems or services those credentials provide access to.
+* Whether the exposed credentials were reused elsewhere.
+* Whether the attacker used any of the compromised credentials.
+* Which accounts require immediate credential resets or access revocation.
+
+The identified exfiltration infrastructure, files, hashes, domains, IP addresses, usernames, and other indicators should also be retained as IOCs for further detection and incident response.
+
+### Investigation Status
+
+The investigation documented multiple stages of the attack, including ransomware execution, patient-data collection, data exfiltration, network reconnaissance, credential collection, and credential exfiltration.
+
+The investigation is now complete from the current KC7Cyber investigation path.
+
+
 
 
