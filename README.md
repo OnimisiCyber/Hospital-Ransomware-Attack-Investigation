@@ -843,5 +843,41 @@ Current findings on `RQJQ-MACHINE` include:
 * 6 discovery-related commands were identified.
 * The first identified discovery command was `systeminfo`.
 
+### 13. Identifying Network Scanning Activity on Anthony Davis's Machine
+
+The investigation returned to Anthony Davis's machine, `AMFB-MACHINE`, to look for additional reconnaissance activity.
+
+The focus was on process commands containing `scanner` during the specified investigation period.
+
+### KQL Query
+
+```kql id="k3v8pn"
+ProcessEvents
+| where hostname == "AMFB-MACHINE"
+| where timestamp between (datetime(2024-05-13) .. datetime(2024-05-17))
+| where process_commandline contains "scanner"
+| distinct process_commandline
+```
+
+### Finding
+
+The query identified the use of:
+
+`advanced-ip-scanner.exe`
+
+The tool was executed on Anthony Davis's machine during the investigation period.
+
+### Analysis
+
+The presence of `advanced-ip-scanner.exe` indicates network scanning activity on `AMFB-MACHINE`.
+
+The activity is relevant because network scanning helps identify hosts and network resources within an environment. In the context of the wider investigation, this provides evidence of reconnaissance activity occurring on Anthony Davis's machine.
+
+
+### Evidence
+
+Screenshot of the KQL query and returned process command:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_22_44_39" src="https://github.com/user-attachments/assets/29ed8929-ac49-4180-b1a1-2f2bf66a4bdb" />
 
 
