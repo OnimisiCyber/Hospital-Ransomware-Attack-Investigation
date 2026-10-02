@@ -880,4 +880,48 @@ Screenshot of the KQL query and returned process command:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-02_22_44_39" src="https://github.com/user-attachments/assets/29ed8929-ac49-4180-b1a1-2f2bf66a4bdb" />
 
+### 14. Investigating Potential Exfiltration of Network Information
+
+After identifying `advanced-ip-scanner.exe` on `AMFB-MACHINE`, the next step was to investigate whether information gathered from the network scanning activity was stored or prepared for exfiltration through document files.
+
+The investigation checked both DOCX and PDF-related process activity.
+
+### KQL Query
+
+```kql id="b8q4xm"
+ProcessEvents
+| where hostname == "AMFB-MACHINE"
+| where timestamp between (datetime(2024-05-13) .. datetime(2024-05-17))
+| where process_commandline contains "pdf"
+| distinct process_commandline
+```
+
+### Finding
+
+No relevant DOCX file was identified during the investigation.
+
+The PDF search identified a file named:
+
+`network_diagrams.pdf`
+
+### Analysis
+
+The discovery of `network_diagrams.pdf` is relevant because network diagrams could contain information about the hospital's network structure, systems, and connections.
+
+
+### Evidence
+
+Screenshot of the KQL query and returned process command:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_22_48_54" src="https://github.com/user-attachments/assets/e4b43174-2b61-48a1-a7aa-215268a7651c" />
+
+### Investigation Status
+
+Current findings from this stage:
+
+* `advanced-ip-scanner.exe` was identified on `AMFB-MACHINE`.
+* The investigation found no relevant DOCX result.
+* `network_diagrams.pdf` was identified from the PDF-related process activity.
+
+
 
