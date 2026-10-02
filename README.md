@@ -474,3 +474,76 @@ This creates an important connection between the suspicious infrastructure and A
 Screenshot of the authentication query and result:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-01_22_41_41" src="https://github.com/user-attachments/assets/92a3d41a-2a1c-45f5-9bb7-3d5c918dc075" />
+
+### 10. Investigating a Lookalike Malicious Domain
+
+The investigation identified a possible phishing or malvertising-related activity involving a domain designed to resemble the legitimate Raising Cane's website.
+
+The legitimate domain is:
+
+`raisingcanes.com`
+
+The suspicious lookalike domain identified in the investigation is:
+
+`raisinkanes.com`
+
+The domains use similar names, which could make the malicious domain harder for staff to distinguish from the legitimate website.
+
+### 10.1 Identifying Requests to the Malicious Domain
+
+The first step was to determine how many outbound network requests were made to the suspicious domain.
+
+### KQL Query
+
+```kql id="r8c2nf"
+OutboundNetworkEvents
+| where url contains "raisinkanes"
+| count
+```
+
+### Result
+
+The query returned:
+
+`26`
+
+This represents 26 outbound network events matching `raisinkanes`.
+
+### Evidence
+
+Screenshot of the KQL query and result:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_20_53_34" src="https://github.com/user-attachments/assets/2b0eaf63-8e45-46ad-8bc3-b4953dda4c48" />
+
+### 10.2 Identifying Unique Staff Sources
+
+The next step was to determine how many unique source IPs accessed the suspicious domain.
+
+### KQL Query
+
+```kql id="n4w7ks"
+OutboundNetworkEvents
+| where url contains "raisinkanes"
+| distinct src_ip
+```
+
+### Result
+
+The query returned:
+
+`24`
+
+This means 24 unique source IPs generated outbound requests matching `raisinkanes`.
+
+### Evidence
+
+Screenshot of the KQL query and result:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_20_55_53" src="https://github.com/user-attachments/assets/48457282-0542-476f-b089-097705984eac" />
+### Analysis
+
+The investigation identified 26 outbound requests from 24 unique source IPs to the lookalike domain `raisinkanes.com`.
+
+The difference between the two numbers indicates that some source IPs generated more than one matching request.
+
+
