@@ -797,4 +797,51 @@ Screenshot of the KQL query showing the Cobalt Strike command line and network i
 
 <img width="1366" height="768" alt="Screenshot_2026-10-02_22_09_08" src="https://github.com/user-attachments/assets/f7843ed0-e792-4884-80ca-8f3a43d7d4f2" />
 
+### 12.5 Investigating Discovery Activity
+
+After identifying `cobaltstrike.exe` and the associated connection to `93.238.22.122:50050`, the next step was to investigate whether the compromised host showed signs of system or network discovery activity.
+
+### KQL Query
+
+```kql id="z5r8kc"
+ProcessEvents
+| where hostname == "RQJQ-MACHINE"
+| where timestamp between (datetime(2024-05-02) .. datetime(2024-05-04))
+| distinct process_commandline
+```
+
+### Finding
+
+The query identified 6 discovery-related commands executed on `RQJQ-MACHINE`.
+
+The first identified command was:
+
+`systeminfo`
+
+The `systeminfo` command is used to retrieve information about the Windows system, including operating system and system configuration details.
+
+### Analysis
+
+The presence of 6 discovery commands shows that additional reconnaissance activity occurred on `RQJQ-MACHINE` after the earlier Cobalt Strike activity.
+
+The first identified command, `systeminfo`, indicates an attempt to gather information about the compromised system.
+
+### Evidence
+
+Screenshot of the KQL query and returned discovery commands:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_22_20_40" src="https://github.com/user-attachments/assets/baa496b9-8611-4e55-9e9f-e1986829c58b" />
+
+### Investigation Status
+
+Current findings on `RQJQ-MACHINE` include:
+
+* `Raisin_Kane_Promo_Offer.docx` downloaded through Chrome.
+* The document was opened with Microsoft Word.
+* `cobaltstrike.exe` was downloaded approximately 27 seconds later.
+* `cobaltstrike.exe` was associated with `93.238.22.122:50050`.
+* 6 discovery-related commands were identified.
+* The first identified discovery command was `systeminfo`.
+
+
 
