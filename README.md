@@ -634,3 +634,113 @@ Screenshot showing the `totally-legit-domain.com` activity and file redirects:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-02_21_20_39" src="https://github.com/user-attachments/assets/1566f7af-c841-4677-b64e-de57fec48b9c" />
 
+### 12. Investigating the Malicious Document on Endpoint Systems
+
+After identifying `Raisin_Kane_Promo_Offer.docx` in the redirect chain, the next step was to determine whether the document was downloaded onto any hospital systems.
+
+### 12.1 Identifying Systems with the Document
+
+### KQL Query
+
+```kql id="f3n8wx"
+FileCreationEvents
+| where filename == "Raisin_Kane_Promo_Offer.docx"
+```
+
+### Result
+
+The query identified the document on:
+
+`24 systems`
+
+The first system examined was:
+
+Hostname:
+
+`RQJQ-MACHINE`
+
+The file was downloaded through Google Chrome.
+
+### Evidence
+
+Screenshot of the file creation query and result:
+
+`[Add Screenshot Here]`
+
+### 12.2 Investigating Activity on RQJQ-MACHINE
+
+The hostname was investigated to examine the activity surrounding the document download.
+
+### KQL Query
+
+```kql id="c7v2mz"
+FileCreationEvents
+| where hostname == "RQJQ-MACHINE"
+```
+
+### Finding
+
+The investigation showed that after `Raisin_Kane_Promo_Offer.docx` was downloaded, an executable named:
+
+`cobaltstrike.exe`
+
+was downloaded approximately 27 seconds later.
+
+### Analysis
+
+The short time interval between the document download and the subsequent `cobaltstrike.exe` download makes the sequence relevant to the investigation.
+
+The timing alone does not establish that the document caused the executable download. Further process and network evidence is required to establish the relationship between the two events.
+
+### Evidence
+
+Screenshot showing the document and `cobaltstrike.exe` file creation events:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_21_41_34" src="https://github.com/user-attachments/assets/2e06ebef-26c1-4d85-87ea-7d90f689a633" />
+
+### 12.3 Investigating Execution of the Downloaded Document
+
+The next step was to examine process activity on `RQJQ-MACHINE` around the time of the document activity.
+
+### KQL Query
+
+```kql id="w6p4kr"
+ProcessEvents
+| where hostname == "RQJQ-MACHINE"
+| where timestamp between (datetime(2024-05-01) .. datetime(2024-05-02))
+| where process_commandline contains "Raisin_Kane_Promo_Offer"
+```
+
+### Finding
+
+The query identified the following command line:
+
+```text
+C:\Program Files\Microsoft Office\Office16\WINWORD.EXE" "C:\Users\evbrowne\Downloads\Raisin_Kane_Promo_Offer.docx
+```
+
+The command line shows that Microsoft Word was used to open the downloaded document from the user's Downloads directory.
+
+User:
+
+`evbrowne`
+
+Host:
+
+`RQJQ-MACHINE`
+
+### Analysis
+
+The evidence establishes the following sequence on `RQJQ-MACHINE`:
+
+1. `Raisin_Kane_Promo_Offer.docx` was downloaded through Chrome.
+2. Microsoft Word opened the document from the user's Downloads directory.
+3. Approximately 27 seconds later, `cobaltstrike.exe` was downloaded.
+
+
+### Evidence
+
+Screenshot of the process command-line query and result:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_22_01_25" src="https://github.com/user-attachments/assets/e9bed9c8-c263-4ee8-9878-659c62e1e53e" />
+
