@@ -540,6 +540,7 @@ This means 24 unique source IPs generated outbound requests matching `raisinkane
 Screenshot of the KQL query and result:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-02_20_55_53" src="https://github.com/user-attachments/assets/48457282-0542-476f-b089-097705984eac" />
+
 ### Analysis
 
 The investigation identified 26 outbound requests from 24 unique source IPs to the lookalike domain `raisinkanes.com`.
