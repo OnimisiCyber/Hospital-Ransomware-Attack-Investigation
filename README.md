@@ -744,3 +744,57 @@ Screenshot of the process command-line query and result:
 
 <img width="1366" height="768" alt="Screenshot_2026-10-02_22_01_25" src="https://github.com/user-attachments/assets/e9bed9c8-c263-4ee8-9878-659c62e1e53e" />
 
+### 12.4 Identifying Network Indicators Associated with Cobalt Strike
+
+The next step was to investigate the command-line activity associated with `cobaltstrike.exe` on `RQJQ-MACHINE` and identify additional indicators of compromise.
+
+### KQL Query
+
+```kql id="q4m8vz"
+ProcessEvents
+| where hostname == "RQJQ-MACHINE"
+| where timestamp between (datetime(2024-05-01) .. datetime(2024-05-02))
+| where process_commandline contains "cobaltstrike"
+| distinct process_commandline
+```
+
+### Finding
+
+The process command-line activity revealed a network connection to:
+
+IP address:
+
+`93.238.22.122`
+
+Port:
+
+`50050`
+
+The connection was associated with the `cobaltstrike` process.
+
+### Analysis
+
+The IP address and port provide additional network indicators for the investigation.
+
+The observed activity shows `cobaltstrike.exe` associated with a connection to `93.238.22.122` over port `50050`.
+
+Port `50050` is commonly associated with Cobalt Strike Beacon communication, so this finding warrants further investigation of the destination IP, network events, timestamps, and other hosts communicating with the same infrastructure.
+
+
+### IOC
+
+IP Address: `93.238.22.122`
+
+Port: `50050`
+
+Associated Process: `cobaltstrike.exe`
+
+Host: `RQJQ-MACHINE`
+
+### Evidence
+
+Screenshot of the KQL query showing the Cobalt Strike command line and network indicator:
+
+<img width="1366" height="768" alt="Screenshot_2026-10-02_22_09_08" src="https://github.com/user-attachments/assets/f7843ed0-e792-4884-80ca-8f3a43d7d4f2" />
+
+
